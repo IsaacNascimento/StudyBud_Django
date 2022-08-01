@@ -4,7 +4,7 @@ from django.contrib import messages;
 from unicodedata import name;
 from django.db.models import Q;
 from django.shortcuts import render, redirect;
-from .models import Room, Topic;
+from .models import Room, Topic, Message;
 from .forms import RoomForm;
 from django.contrib.auth.models import User;
 from django.contrib.auth import authenticate, login, logout;
@@ -20,7 +20,7 @@ def loginPage(req):
         return redirect('home');
 
     if req.method == 'POST':
-        username = req.POST.get('username');
+        username = req.POST.get('username').lower();
         password = req.POST.get('password');
 
         try :
@@ -46,6 +46,18 @@ def logoutPage(req):
 
 def registerPage(req):
     form = UserCreationForm();
+
+    if req.method == 'POST':
+        form = UserCreationForm(req.POST);
+        if form.is_valid():
+            user = form.save(commit=False);
+            user.username = user.username.lower();
+            user.save();
+            login(req, user);
+            return redirect('home');
+        else:
+            messages.error(req, 'An error occurred during registration');  
+
     context = {'form': form};
     return render(req, 'base/login_register.html', context);
 
@@ -68,8 +80,18 @@ def home(req):
     return render(req, 'base/home.html', context);
 
 def room(req, pk):
-    rooms = Room.objects.get(id=pk);
-    context = {'room': rooms};    
+    room = Room.objects.get(id=pk);
+    room_messages = room.message_set.all().order_by('-created');
+
+    if req.method == 'POST':
+        message = Message.objects.create(
+            user=req.user,
+            room=room,
+            body=req.POST.get('body'),
+        );
+        return redirect('room', pk=room.id);
+
+    context = {'room': room, 'room_messages': room_messages};    
     return render(req, 'base/room.html', context);
 
 
