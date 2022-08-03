@@ -136,7 +136,9 @@ def createRoom(req):
         # print(req.POST);
         form = RoomForm(req.POST);
         if form.is_valid():
-            form.save();
+            room = form.save(commit=False);
+            room.host = req.user;
+            room.save();
             return redirect('home');
 
     context = {'form': form};
