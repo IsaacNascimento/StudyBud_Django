@@ -115,6 +115,18 @@ def room(req, pk):
     return render(req, 'base/room.html', context);
 
 
+def userProfile(req, pk):
+    user = User.objects.get(id=pk);
+    room_messages = user.message_set.all();
+    rooms = user.room_set.all();
+    topics = Topic.objects.all();
+    context = {
+        'user': user, 
+        'rooms': rooms, 
+        'room_messages': room_messages,
+        'topics': topics,
+        };
+    return render(req, 'base/profile.html', context);
 
 
 @login_required(login_url='/login')
