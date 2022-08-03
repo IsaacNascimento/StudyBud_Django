@@ -40,9 +40,13 @@ def loginPage(req):
     context = {'page': page};
     return render(req, 'base/login_register.html', context);
 
+
+
 def logoutPage(req):
     logout(req);
     return redirect('home');
+
+
 
 def registerPage(req):
     form = UserCreationForm();
@@ -61,6 +65,8 @@ def registerPage(req):
     context = {'form': form};
     return render(req, 'base/login_register.html', context);
 
+
+
 def home(req):
     q = req.GET.get('q') if req.GET.get('q') != None else '';
 
@@ -69,19 +75,30 @@ def home(req):
         Q(name__icontains=q) |
         Q(description__icontains=q)
         );
-    # rooms = Room.objects.all();
 
     room_count = rooms.count();
-
     topics = Topic.objects.all();
 
-    context = {'rooms': rooms, 'topics': topics, 'room_count': room_count};
+    room = Room.objects.all();
+
+    room_messages = Message.objects.filter(Q(room__name__icontains=q));
+    print(room);
+
+
+    context = {
+        'rooms': rooms, 
+        'topics': topics,
+        'room_count': room_count, 
+        'room_messages': room_messages
+        };
 
     return render(req, 'base/home.html', context);
 
+
+
 def room(req, pk):
     room = Room.objects.get(id=pk);
-    room_messages = room.message_set.all().order_by('-created');
+    room_messages = room.message_set.all()
     participants = room.participants.all();
 
     if req.method == 'POST':
@@ -97,6 +114,8 @@ def room(req, pk):
     return render(req, 'base/room.html', context);
 
 
+
+
 @login_required(login_url='/login')
 def createRoom(req):
     form = RoomForm();
@@ -109,6 +128,8 @@ def createRoom(req):
 
     context = {'form': form};
     return render(req, 'base/room_form.html', context);
+
+
 
 @login_required(login_url='login')
 def updateRoom(req, pk):
@@ -126,6 +147,8 @@ def updateRoom(req, pk):
 
     context = {'form': form};
     return render(req, 'base/room_form.html', context);
+
+
     
 @login_required(login_url='/login')    
 def deleteRoom(req, pk):
@@ -138,6 +161,8 @@ def deleteRoom(req, pk):
         room.delete();
         return redirect('home');
     return render(req, 'base/delete.html', {'obj': room});
+
+
 
 
 @login_required(login_url='login')    
