@@ -80,8 +80,9 @@ def home(req):
     topics = Topic.objects.all();
 
     room = Room.objects.all();
+    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q));
+    # room_messages = Message.objects.all();
 
-    room_messages = Message.objects.filter(Q(room__name__icontains=q));
     print(room);
 
 
