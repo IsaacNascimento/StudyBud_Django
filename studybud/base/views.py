@@ -83,7 +83,7 @@ def home(req):
     room_messages = Message.objects.filter(Q(room__topic__name__icontains=q));
     # room_messages = Message.objects.all();
 
-    print(room);
+    # print(room);
 
 
     context = {
