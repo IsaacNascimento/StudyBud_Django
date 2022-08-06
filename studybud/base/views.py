@@ -5,7 +5,7 @@ from unicodedata import name;
 from django.db.models import Q;
 from django.shortcuts import render, redirect;
 from .models import Room, Topic, Message;
-from .forms import RoomForm;
+from .forms import RoomForm, UserForm;
 from django.contrib.auth.models import User;
 from django.contrib.auth import authenticate, login, logout;
 from django.contrib.auth.decorators import login_required;
@@ -209,3 +209,17 @@ def deleteMessage(req, pk):
         message.delete();
         return redirect('home');
     return render(req, 'base/delete.html', {'obj': message});
+
+@login_required(login_url='login')    
+def updateUser(req):
+    user = req.user;
+    form = UserForm(instance=user);
+    context = {'form': form};
+
+    if req.method == 'POST':
+        form = UserForm(req.POST, instance=user);
+        if form.is_valid():
+            form.save();
+            return redirect('user-profile', pk=user.id);                        
+
+    return render(req, 'base/update-user.html', context);  
