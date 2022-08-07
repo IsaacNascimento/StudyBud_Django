@@ -223,3 +223,8 @@ def updateUser(req):
             return redirect('user-profile', pk=user.id);                        
 
     return render(req, 'base/update-user.html', context);  
+
+def topicsPage(req):
+    topics = Topic.objects.filter();
+    context = {'topics': topics};
+    return render(req, 'base/topics.html', context);    
