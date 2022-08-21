@@ -229,3 +229,8 @@ def topicsPage(req):
     topics = Topic.objects.filter(name__icontains=q);
     context = {'topics': topics};
     return render(req, 'base/topics.html', context);    
+
+def activityPage(req):
+    room_messages = Message.objects.all();
+    context ={'room_messages': room_messages};
+    return render(req, 'base/activity.html', context);
