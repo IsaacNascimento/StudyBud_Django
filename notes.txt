@@ -105,3 +105,6 @@ Get Access to the admin sistem:
 
 IsaacNascimento
 S+fv3{V?V6(&(}!w
+
+CORS
+https://pypi.org/project/django-cors-headers/
