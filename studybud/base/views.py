@@ -4,13 +4,14 @@ from django.contrib import messages;
 from unicodedata import name;
 from django.db.models import Q;
 from django.shortcuts import render, redirect;
-from .models import Room, Topic, Message;
-from .forms import RoomForm, UserForm;
-from django.contrib.auth.models import User;
+from .models import Room, Topic, Message, User;
+from .forms import RoomForm, UserForm, MyUserCreationForm;
+# from django.contrib.auth.models import User;
 from django.contrib.auth import authenticate, login, logout;
 from django.contrib.auth.decorators import login_required;
 from django.http import HttpResponse;
-from django.contrib.auth.forms import UserCreationForm;
+
+# from django.contrib.auth.forms import UserCreationForm;
 
 # Create your views here.
 
@@ -20,15 +21,15 @@ def loginPage(req):
         return redirect('home');
 
     if req.method == 'POST':
-        username = req.POST.get('username').lower();
+        email = req.POST.get('email').lower();
         password = req.POST.get('password');
 
         try :
-            user = User.objects.get(username=username);
+            user = User.objects.get(email=email);
         except:
             messages.error(req, 'User does not exist');
 
-        user = authenticate(req, username=username, password=password);
+        user = authenticate(req, email=email, password=password);
 
         if user is not None:
             login(req, user);
@@ -49,10 +50,10 @@ def logoutPage(req):
 
 
 def registerPage(req):
-    form = UserCreationForm();
+    form = MyUserCreationForm();
 
     if req.method == 'POST':
-        form = UserCreationForm(req.POST);
+        form = MyUserCreationForm(req.POST);
         if form.is_valid():
             user = form.save(commit=False);
             user.username = user.username.lower();
@@ -117,6 +118,7 @@ def room(req, pk):
 
 def userProfile(req, pk):
     user = User.objects.get(id=pk);
+    # print(user);
     room_messages = user.message_set.all();
     rooms = user.room_set.all();
     topics = Topic.objects.all();
@@ -217,7 +219,7 @@ def updateUser(req):
     context = {'form': form};
 
     if req.method == 'POST':
-        form = UserForm(req.POST, instance=user);
+        form = UserForm(req.POST, req.FILES,instance=user);
         if form.is_valid():
             form.save();
             return redirect('user-profile', pk=user.id);                        
