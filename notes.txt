@@ -108,3 +108,8 @@ S+fv3{V?V6(&(}!w
 
 CORS
 https://pypi.org/project/django-cors-headers/
+
+
+=> image user profile
+
+python -m pip install pillow
